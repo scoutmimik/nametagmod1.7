@@ -25,7 +25,15 @@ public class NametagRenderer {
 
    public static void renderName(EntityLivingBase entity, double x, double y, double z) {
       boolean isPlayer = entity instanceof EntityPlayer;
-      if (isPlayer && scale == 0.0F) {
+      
+      // Ak to NIE JE reálny hráč (je to NPC/moba), vlastný render úplne preskočíme,
+      // čím zamedzíme zdvojovaniu aj lietaniu nametagov.
+      if (!isPlayer) {
+         MinecraftForge.EVENT_BUS.post(new RenderLivingEvent.Specials.Post(entity, a, (float)x, (float)y, (float)z));
+         return;
+      }
+
+      if (scale == 0.0F) {
          return;
       }
 
@@ -35,14 +43,14 @@ public class NametagRenderer {
          float f = entity.isSneaking() ? RendererLivingEntity.NAME_TAG_RANGE_SNEAK : RendererLivingEntity.NAME_TAG_RANGE;
          if (d0 < (double)(f * f)) {
             String s = entity.getCommandSenderName();
-            float f1 = isPlayer ? 0.02666667F * scale : 0.02666667F;
+            float f1 = 0.02666667F * scale;
             GL11.glAlphaFunc(516, 0.1F);
             
             if (entity.isSneaking()) {
                FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
                
-               // Ak je to reálny hráč, pripočítame výšku entity (entity.height) + offset
-               double correctY = isPlayer ? (y + entity.height + (double)offset + 0.2D) : (y + 0.3D);
+               // Pre hráča (vrátane seba) pripočítame výšku tela + offset nad hlavu
+               double correctY = y + entity.height + (double)offset + 0.3D;
 
                GL11.glPushMatrix();
                GL11.glTranslatef((float)x, (float)correctY, (float)z);
@@ -74,10 +82,8 @@ public class NametagRenderer {
                GL11.glDisable(GL11.GL_BLEND);
                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                GL11.glPopMatrix();
-            } else if (isPlayer) {
-               playerRenderOffsetLivingLabel(entity, x, y, z, s, 0.02666667F, d0);
             } else {
-               renderOffsetLivingLabel(entity, x, y, z, s, 0.02666667F, d0, false);
+               playerRenderOffsetLivingLabel(entity, x, y, z, s, 0.02666667F, d0);
             }
          }
       }
@@ -91,10 +97,10 @@ public class NametagRenderer {
          ScoreObjective scoreobjective = scoreboard.getObjectiveInDisplaySlot(2);
          if (scoreobjective != null) {
             Score score = scoreboard.getValueFromObjective(entityIn.getCommandSenderName(), scoreobjective);
-            renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64, true);
+            renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64);
          }
       }
-      renderOffsetLivingLabel(entityIn, x, y, z, str, p_177069_9_, p_177069_10_, true);
+      renderOffsetLivingLabel(entityIn, x, y, z, str, p_177069_9_, p_177069_10_);
    }
 
    protected static boolean canRenderName(EntityLivingBase entity) {
@@ -110,19 +116,19 @@ public class NametagRenderer {
       }
    }
 
-   protected static void renderOffsetLivingLabel(EntityLivingBase entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_, boolean isPlayer) {
-      renderLivingLabel(entityIn, str, x, y, z, 64, isPlayer);
+   protected static void renderOffsetLivingLabel(EntityLivingBase entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_) {
+      renderLivingLabel(entityIn, str, x, y, z, 64);
    }
 
-   protected static void renderLivingLabel(EntityLivingBase entityIn, String str, double x, double y, double z, int maxDistance, boolean isPlayer) {
+   protected static void renderLivingLabel(EntityLivingBase entityIn, String str, double x, double y, double z, int maxDistance) {
       EntityPlayerSP renderPlayer = Minecraft.getMinecraft().thePlayer;
       double d0 = entityIn.getDistanceSqToEntity(renderPlayer);
       if (d0 <= (double)(maxDistance * maxDistance)) {
          FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
-         float f1 = isPlayer ? 0.02666667F * scale : 0.02666667F;
+         float f1 = 0.02666667F * scale;
 
-         // Výpočet výšky: Hráčovi pripočítame výšku tela, NPC posúvame len mierne
-         double correctY = isPlayer ? (y + entityIn.height + (double)offset + 0.2D) : (y + 0.3D);
+         // Vždy pripočítame výšku hráča, aby nametag nebol v nohách pri selftag
+         double correctY = y + entityIn.height + (double)offset + 0.3D;
 
          GL11.glPushMatrix();
          GL11.glTranslatef((float)x, (float)correctY, (float)z);
