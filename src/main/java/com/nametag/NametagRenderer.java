@@ -1,14 +1,88 @@
-protected static void renderLivingLabel(EntityLivingBase entityIn, String str, double x, double y, double z, int maxDistance) {
+package com.nametag;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.FontRenderer;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.RendererLivingEntity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.scoreboard.Score;
+import net.minecraft.scoreboard.ScoreObjective;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraftforge.client.event.RenderLivingEvent;
+import net.minecraftforge.common.MinecraftForge;
+import org.lwjgl.opengl.GL11;
+
+public class NametagRenderer {
+   public static float alpha = 0.25F;
+   public static float offset = 0.0F;
+   public static float scale = 1.0F;
+   public static boolean selftag = false;
+   public static RendererLivingEntity a;
+
+   public static void renderName(EntityLivingBase entity, double x, double y, double z) {
+      if (!(entity instanceof EntityPlayer) || scale == 0.0F) {
+         return;
+      }
+
+      if (canRenderName(entity)) {
+         EntityPlayerSP renderPlayer = Minecraft.getMinecraft().thePlayer;
+         double d0 = entity.getDistanceSqToEntity(renderPlayer);
+         float f = entity.isSneaking() ? RendererLivingEntity.NAME_TAG_RANGE_SNEAK : RendererLivingEntity.NAME_TAG_RANGE;
+         if (d0 < (double)(f * f)) {
+            String s = entity.getCommandSenderName();
+            GL11.glAlphaFunc(516, 0.1F);
+            
+            playerRenderOffsetLivingLabel(entity, x, y, z, s, 0.02666667F, d0);
+         }
+      }
+
+      MinecraftForge.EVENT_BUS.post(new RenderLivingEvent.Specials.Post(entity, a, (float)x, (float)y, (float)z));
+   }
+
+   protected static void playerRenderOffsetLivingLabel(EntityLivingBase entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_) {
+      if (p_177069_10_ < (double)100.0F) {
+         Scoreboard scoreboard = ((EntityPlayer)entityIn).getWorldScoreboard();
+         ScoreObjective scoreobjective = scoreboard.getObjectiveInDisplaySlot(2);
+         if (scoreobjective != null) {
+            Score score = scoreboard.getValueFromObjective(entityIn.getCommandSenderName(), scoreobjective);
+            renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64);
+         }
+      }
+      renderOffsetLivingLabel(entityIn, x, y, z, str, p_177069_9_, p_177069_10_);
+   }
+
+   protected static boolean canRenderName(EntityLivingBase entity) {
+      return canRenderName2(entity);
+   }
+
+   protected static boolean canRenderName2(EntityLivingBase entity) {
+      EntityPlayerSP entityplayersp = Minecraft.getMinecraft().thePlayer;
+      if (entity == entityplayersp) {
+         return selftag;
+      } else {
+         return Minecraft.isGuiEnabled() && !entity.isInvisibleToPlayer(entityplayersp) && entity.riddenByEntity == null;
+      }
+   }
+
+   protected static void renderOffsetLivingLabel(EntityLivingBase entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_) {
+      renderLivingLabel(entityIn, str, x, y, z, 64);
+   }
+
+   protected static void renderLivingLabel(EntityLivingBase entityIn, String str, double x, double y, double z, int maxDistance) {
       EntityPlayerSP renderPlayer = Minecraft.getMinecraft().thePlayer;
       double d0 = entityIn.getDistanceSqToEntity(renderPlayer);
       if (d0 <= (double)(maxDistance * maxDistance)) {
          FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
          float f1 = 0.02666667F * scale;
 
-         // Default Minecraft 1.7.10 výpočet pre nametag hráča
+         // Štandardný Vanilla 1.7.10 výpočet výšky pre nametag
          double correctY = y + entityIn.height + (double)offset + 0.5D;
          if (entityIn.isSneaking()) {
-            correctY -= 0.25D; // Prikrčenie zníži nametag
+            correctY -= 0.25D;
          }
 
          GL11.glPushMatrix();
@@ -50,3 +124,31 @@ protected static void renderLivingLabel(EntityLivingBase entityIn, String str, d
          GL11.glPopMatrix();
       }
    }
+
+   public static void setAlpha(int a) {
+      alpha = (float)a / 100.0F;
+   }
+
+   public static void setScale(int s) {
+      if (s == 0) {
+         scale = 0.0F;
+      }
+      scale = (float)s / 100.0F;
+   }
+
+   public static void setSelftag(boolean tag) {
+      selftag = tag;
+   }
+
+   public static void setOffset(int off) {
+      offset = (float)off / 100.0F;
+   }
+
+   public static int getOffset() {
+      return (int)(offset * 100.0F);
+   }
+
+   public static int getScale() {
+      return (int)(scale * 100.0F);
+   }
+}
