@@ -1,51 +1,33 @@
 package com.nametag;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommand;
+import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraftforge.common.MinecraftForge;
+import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.TickEvent;
 
-public class NametagBGCommand implements ICommand {
+public class NametagBGCommand extends CommandBase {
+
+   @Override
    public String getCommandName() {
       return "nametag";
    }
 
+   @Override
    public String getCommandUsage(ICommandSender sender) {
       return "/nametag";
    }
 
-   public void processCommand(ICommandSender sender, String[] args) throws CommandException {
-      MinecraftForge.EVENT_BUS.register(this);
+   @Override
+   public void processCommand(ICommandSender sender, String[] args) {
+      // Registrácia na správnu FML zbernicu pre TickEvent
+      FMLCommonHandler.instance().bus().register(this);
    }
 
    @SubscribeEvent
    public void onClientTick(TickEvent.ClientTickEvent event) {
-      MinecraftForge.EVENT_BUS.unregister(this);
+      FMLCommonHandler.instance().bus().unregister(this);
       Minecraft.getMinecraft().displayGuiScreen(new GUIMain());
-   }
-
-   public boolean canCommandSenderUseCommand(ICommandSender sender) {
-      return true;
-   }
-
-   public int compareTo(Object o) {
-      return 0;
-   }
-
-   public boolean isUsernameIndex(String[] args, int index) {
-      return false;
-   }
-
-   public List getCommandAliases() {
-      return new ArrayList();
-   }
-
-   public List addTabCompletionOptions(ICommandSender sender, String[] args) {
-      return null;
    }
 }
