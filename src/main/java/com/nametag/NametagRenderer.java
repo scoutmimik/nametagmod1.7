@@ -25,11 +25,8 @@ public class NametagRenderer {
 
    public static void renderName(EntityLivingBase entity, double x, double y, double z) {
       boolean isPlayer = entity instanceof EntityPlayer;
-      if (isPlayer) {
-         if (scale == 0.0F) {
-            return;
-         }
-         y += (double)offset;
+      if (isPlayer && scale == 0.0F) {
+         return;
       }
 
       if (canRenderName(entity)) {
@@ -43,8 +40,21 @@ public class NametagRenderer {
             
             if (entity.isSneaking()) {
                FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
+               
+               // Bezpečný výpočet výšky aj pri skráčaní
+               float entityHeight = entity.height;
+               if (entityHeight > 3.0F || entityHeight <= 0.0F) {
+                  entityHeight = 1.8F;
+               }
+               
+               double correctY = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * (double)Minecraft.getMinecraft().timer.renderPartialTicks - RenderManager.renderPosY;
+               correctY += entityHeight + 0.3D;
+               if (isPlayer) {
+                  correctY += (double)offset;
+               }
+
                GL11.glPushMatrix();
-               GL11.glTranslatef((float)x, (float)y + 0.5F, (float)z);
+               GL11.glTranslatef((float)x, (float)correctY, (float)z);
                GL11.glNormal3f(0.0F, 1.0F, 0.0F);
                GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
                GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
@@ -91,7 +101,6 @@ public class NametagRenderer {
          if (scoreobjective != null) {
             Score score = scoreboard.getValueFromObjective(entityIn.getCommandSenderName(), scoreobjective);
             renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64, true);
-            y += (double)((float)a.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
          }
       }
       renderOffsetLivingLabel(entityIn, x, y, z, str, p_177069_9_, p_177069_10_, true);
@@ -121,8 +130,22 @@ public class NametagRenderer {
          FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
          float f1 = isPlayer ? 0.02666667F * scale : 0.02666667F;
 
+         // Ošetrenie výšky: ak server pošle neplatné číslo alebo extrémnu výšku, nastavíme výšku človeka
+         float entityHeight = entityIn.height;
+         if (entityHeight > 3.0F || entityHeight <= 0.0F) {
+            entityHeight = 1.8F;
+         }
+
+         // Výpočet presnej Y pozície hlavy voči kamere
+         double correctY = entityIn.lastTickPosY + (entityIn.posY - entityIn.lastTickPosY) * (double)Minecraft.getMinecraft().timer.renderPartialTicks - RenderManager.renderPosY;
+         correctY += entityHeight + 0.3D;
+
+         if (isPlayer) {
+            correctY += (double)offset;
+         }
+
          GL11.glPushMatrix();
-         GL11.glTranslatef((float)x, (float)y + 0.5F, (float)z);
+         GL11.glTranslatef((float)x, (float)correctY, (float)z);
          GL11.glNormal3f(0.0F, 1.0F, 0.0F);
          GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
          GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
