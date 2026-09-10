@@ -44,7 +44,7 @@ public class NametagRenderer {
             if (entity.isSneaking()) {
                FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
                GL11.glPushMatrix();
-               GL11.glTranslatef((float)x, (float)y + entity.height + 0.5F - (entity.isChild() ? entity.height / 2.0F : 0.0F), (float)z);
+               GL11.glTranslatef((float)x, (float)y + 0.5F, (float)z);
                GL11.glNormal3f(0.0F, 1.0F, 0.0F);
                GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
                GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
@@ -74,9 +74,9 @@ public class NametagRenderer {
                GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
                GL11.glPopMatrix();
             } else if (isPlayer) {
-               playerRenderOffsetLivingLabel(entity, x, y - (entity.isChild() ? (double)(entity.height / 2.0F) : (double)0.0F), z, s, 0.02666667F, d0);
+               playerRenderOffsetLivingLabel(entity, x, y, z, s, 0.02666667F, d0);
             } else {
-               renderOffsetLivingLabel(entity, x, y - (entity.isChild() ? (double)(entity.height / 2.0F) : (double)0.0F), z, s, 0.02666667F, d0, false);
+               renderOffsetLivingLabel(entity, x, y, z, s, 0.02666667F, d0, false);
             }
          }
       }
@@ -120,8 +120,9 @@ public class NametagRenderer {
       if (d0 <= (double)(maxDistance * maxDistance)) {
          FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
          float f1 = isPlayer ? 0.02666667F * scale : 0.02666667F;
+
          GL11.glPushMatrix();
-         GL11.glTranslatef((float)x + 0.0F, (float)y + entityIn.height + 0.5F, (float)z);
+         GL11.glTranslatef((float)x, (float)y + 0.5F, (float)z);
          GL11.glNormal3f(0.0F, 1.0F, 0.0F);
          GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
          GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
