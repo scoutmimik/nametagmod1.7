@@ -108,12 +108,8 @@ public class NametagRenderer {
          if (entity instanceof EntityPlayer && entity != entityplayersp) {
             Team team = entity.getTeam();
             Team team1 = entityplayersp.getTeam();
-            if (team != null) {
-               int visibility = team.func_9666b();
-               // 0: always, 1: never, 2: hide other teams, 3: hide own team
-               if (visibility == 1) return false;
-               if (visibility == 2) return team1 == null || team.isSameTeam(team1);
-               if (visibility == 3) return team1 == null || !team.isSameTeam(team1);
+            if (team != null && team1 != null) {
+               return team.isSameTeam(team1);
             }
          }
          return Minecraft.isGuiEnabled() && !entity.isInvisibleToPlayer(entityplayersp) && entity.riddenByEntity == null;
