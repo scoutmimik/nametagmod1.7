@@ -20,6 +20,11 @@ public class NametagBGCommand extends CommandBase {
    }
 
    @Override
+   public int getRequiredPermissionLevel() {
+      return 0; // Umožní použitie príkazu aj bez OP tebe/hráčovi na serveroch
+   }
+
+   @Override
    public void processCommand(ICommandSender sender, String[] args) {
       // Registrácia na správnu FML zbernicu pre TickEvent
       FMLCommonHandler.instance().bus().register(this);
