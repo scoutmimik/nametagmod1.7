@@ -101,7 +101,7 @@ public class NametagRenderer {
    }
 
    protected static boolean canRenderName(EntityLivingBase entity) {
-      return canRenderName2(entity) && entity.func_94059_bO();
+      return canRenderName2(entity) && entity.hasCustomNameTag();
    }
 
    protected static boolean canRenderName2(EntityLivingBase entity) {
