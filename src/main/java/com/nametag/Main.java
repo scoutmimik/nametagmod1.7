@@ -11,7 +11,7 @@ import cpw.mods.fml.common.event.FMLInitializationEvent;
 import cpw.mods.fml.common.event.FMLPreInitializationEvent;
 
 @Mod(
-   modid = "nametageditor",
+   modid = "nametagmod",
    acceptedMinecraftVersions = "[1.7.10]"
 )
 public class Main {
