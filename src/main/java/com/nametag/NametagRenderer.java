@@ -24,8 +24,7 @@ public class NametagRenderer {
    public static RendererLivingEntity a;
 
    public static void renderName(EntityLivingBase entity, double x, double y, double z) {
-      boolean isPlayer = entity instanceof EntityPlayer;
-      if (isPlayer && scale == 0.0F) {
+      if (!(entity instanceof EntityPlayer) || scale == 0.0F) {
          return;
       }
 
@@ -35,50 +34,9 @@ public class NametagRenderer {
          float f = entity.isSneaking() ? RendererLivingEntity.NAME_TAG_RANGE_SNEAK : RendererLivingEntity.NAME_TAG_RANGE;
          if (d0 < (double)(f * f)) {
             String s = entity.getCommandSenderName();
-            float f1 = isPlayer ? 0.02666667F * scale : 0.02666667F;
             GL11.glAlphaFunc(516, 0.1F);
             
-            if (entity.isSneaking()) {
-               FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
-               
-               // Ak y už obsahuje výšku (je výrazne vyššie ako entity.posY), neprirátavame entity.height znovu
-               double correctY = (y > entity.height) ? (y + (double)offset + 0.3D) : (y + entity.height + (double)offset + 0.3D);
-
-               GL11.glPushMatrix();
-               GL11.glTranslatef((float)x, (float)correctY, (float)z);
-               GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-               GL11.glRotatef(-RenderManager.instance.playerViewY, 0.0F, 1.0F, 0.0F);
-               GL11.glRotatef(RenderManager.instance.playerViewX, 1.0F, 0.0F, 0.0F);
-               GL11.glScalef(-f1, -f1, f1);
-               GL11.glTranslatef(0.0F, 9.374999F, 0.0F);
-               GL11.glDisable(GL11.GL_LIGHTING);
-               GL11.glDepthMask(false);
-               GL11.glEnable(GL11.GL_BLEND);
-               OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-               GL11.glDisable(GL11.GL_TEXTURE_2D);
-               int i = fontrenderer.getStringWidth(s) / 2;
-               Tessellator tessellator = Tessellator.instance;
-               tessellator.startDrawingQuads();
-               if (alpha != 0.0F) {
-                  tessellator.setColorRGBA_F(0.0F, 0.0F, 0.0F, alpha);
-                  tessellator.addVertex((double)(-i - 1), (double)-1.0F, (double)0.0F);
-                  tessellator.addVertex((double)(-i - 1), (double)8.0F, (double)0.0F);
-                  tessellator.addVertex((double)(i + 1), (double)8.0F, (double)0.0F);
-                  tessellator.addVertex((double)(i + 1), (double)-1.0F, (double)0.0F);
-               }
-               tessellator.draw();
-               GL11.glEnable(GL11.GL_TEXTURE_2D);
-               GL11.glDepthMask(true);
-               fontrenderer.drawString(s, -fontrenderer.getStringWidth(s) / 2, 0, 553648127);
-               GL11.glEnable(GL11.GL_LIGHTING);
-               GL11.glDisable(GL11.GL_BLEND);
-               GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-               GL11.glPopMatrix();
-            } else if (isPlayer) {
-               playerRenderOffsetLivingLabel(entity, x, y, z, s, 0.02666667F, d0);
-            } else {
-               renderOffsetLivingLabel(entity, x, y, z, s, 0.02666667F, d0);
-            }
+            playerRenderOffsetLivingLabel(entity, x, y, z, s, 0.02666667F, d0);
          }
       }
 
@@ -119,16 +77,10 @@ public class NametagRenderer {
       double d0 = entityIn.getDistanceSqToEntity(renderPlayer);
       if (d0 <= (double)(maxDistance * maxDistance)) {
          FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
-         boolean isPlayer = entityIn instanceof EntityPlayer;
-         float f1 = isPlayer ? 0.02666667F * scale : 0.02666667F;
+         float f1 = 0.02666667F * scale;
 
-         // Kontrola pozície Y: Ak je Y väčšie ako výška entity, súradnica už prichádza posunutá
-         double correctY;
-         if (y > (double)entityIn.height) {
-            correctY = y + 0.3D;
-         } else {
-            correctY = y + entityIn.height + (double)offset + 0.3D;
-         }
+         // Pre reálneho hráča aj pre seba (selftag) vezmeme 'y' a pripočítame plnú výšku hráča + offset
+         double correctY = y + entityIn.height + (double)offset + 0.3D;
 
          GL11.glPushMatrix();
          GL11.glTranslatef((float)x, (float)correctY, (float)z);
