@@ -1,6 +1,5 @@
 package com.nametag;
 
-import java.io.IOException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
@@ -60,7 +59,7 @@ public class GUIMain extends GuiScreen {
       }
    }
 
-   protected void actionPerformed(GuiButton button) throws IOException {
+   protected void actionPerformed(GuiButton button) {
       switch (button.id) {
          case 1:
             NametagRenderer.selftag = !NametagRenderer.selftag;
