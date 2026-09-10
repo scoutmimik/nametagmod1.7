@@ -41,15 +41,7 @@ public class NametagRenderer {
             if (entity.isSneaking()) {
                FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
                
-               float entityHeight = entity.height;
-               if (entityHeight > 3.0F || entityHeight <= 0.0F) {
-                  entityHeight = 1.8F;
-               }
-               
-               double correctY = y + (double)entityHeight + 0.3D;
-               if (isPlayer) {
-                  correctY += (double)offset;
-               }
+               double correctY = isPlayer ? (y + (double)offset + 0.5D) : (y + 0.5D);
 
                GL11.glPushMatrix();
                GL11.glTranslatef((float)x, (float)correctY, (float)z);
@@ -128,16 +120,8 @@ public class NametagRenderer {
          FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
          float f1 = isPlayer ? 0.02666667F * scale : 0.02666667F;
 
-         float entityHeight = entityIn.height;
-         if (entityHeight > 3.0F || entityHeight <= 0.0F) {
-            entityHeight = 1.8F;
-         }
-
-         double correctY = y + (double)entityHeight + 0.3D;
-
-         if (isPlayer) {
-            correctY += (double)offset;
-         }
+         // Pre hráča aplikujeme offset, pre NPC berieme priamo 'y' (ktoré už výšku obsahuje)
+         double correctY = isPlayer ? (y + (double)offset + 0.3D) : (y + 0.3D);
 
          GL11.glPushMatrix();
          GL11.glTranslatef((float)x, (float)correctY, (float)z);
