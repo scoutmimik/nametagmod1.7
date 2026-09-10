@@ -25,12 +25,7 @@ public class NametagRenderer {
    public static RendererLivingEntity a;
 
    public static void renderName(EntityLivingBase entity, double x, double y, double z) {
-      boolean isPlayer = entity instanceof EntityPlayer;
-      if (!isPlayer) {
-         return; // Spracovávame výhradne hráčov
-      }
-
-      if (scale == 0.0F) {
+      if (!(entity instanceof EntityPlayer) || scale == 0.0F) {
          return;
       }
 
@@ -89,9 +84,9 @@ public class NametagRenderer {
    protected static void playerRenderOffsetLivingLabel(EntityLivingBase entityIn, double x, double y, double z, String str, float p_177069_9_, double p_177069_10_) {
       if (p_177069_10_ < (double)100.0F) {
          Scoreboard scoreboard = ((EntityPlayer)entityIn).getWorldScoreboard();
-         ScoreObjective scoreobjective = scoreboard.func_96539_a(2);
+         ScoreObjective scoreobjective = scoreboard.getObjectiveInDisplaySlot(2);
          if (scoreobjective != null) {
-            Score score = scoreboard.func_96529_a(entityIn.getCommandSenderName(), scoreobjective);
+            Score score = scoreboard.getValueFromObjective(entityIn.getCommandSenderName(), scoreobjective);
             renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64, true);
             y += (double)((float)a.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
          }
@@ -101,12 +96,12 @@ public class NametagRenderer {
    }
 
    protected static boolean canRenderName(EntityLivingBase entity) {
-      return canRenderName2(entity) && entity.hasCustomNameTag();
+      return canRenderName2(entity);
    }
 
    protected static boolean canRenderName2(EntityLivingBase entity) {
       if (!(entity instanceof EntityPlayer)) {
-         return false; // Ignoruje všetky entity okrem hráčov (vrátane mobov a NPC)
+         return false;
       }
 
       EntityPlayerSP entityplayersp = Minecraft.getMinecraft().thePlayer;
