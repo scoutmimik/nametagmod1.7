@@ -33,7 +33,8 @@ public class NametagRenderer {
       }
 
       if (canRenderName(entity)) {
-         double d0 = entity.getDistanceSqToEntity(a.renderManager.livingPlayer);
+         EntityPlayerSP renderPlayer = Minecraft.getMinecraft().thePlayer;
+         double d0 = entity.getDistanceSqToEntity(renderPlayer);
          float f = entity.isSneaking() ? RendererLivingEntity.NAME_TAG_RANGE_SNEAK : RendererLivingEntity.NAME_TAG_RANGE;
          if (d0 < (double)(f * f)) {
             String s = entity.getCommandSenderName();
@@ -45,8 +46,8 @@ public class NametagRenderer {
                GL11.glPushMatrix();
                GL11.glTranslatef((float)x, (float)y + entity.height + 0.5F - (entity.isChild() ? entity.height / 2.0F : 0.0F), (float)z);
                GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-               GL11.glRotatef(-a.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-               GL11.glRotatef(a.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+               GL11.glRotatef(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+               GL11.glRotatef(Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
                GL11.glScalef(-f1, -f1, f1);
                GL11.glTranslatef(0.0F, 9.374999F, 0.0F);
                GL11.glDisable(GL11.GL_LIGHTING);
@@ -101,10 +102,10 @@ public class NametagRenderer {
    }
 
    protected static boolean canRenderName2(EntityLivingBase entity) {
-      if (entity == a.renderManager.livingPlayer) {
+      EntityPlayerSP entityplayersp = Minecraft.getMinecraft().thePlayer;
+      if (entity == entityplayersp) {
          return selftag;
       } else {
-         EntityPlayerSP entityplayersp = Minecraft.getMinecraft().thePlayer;
          if (entity instanceof EntityPlayer && entity != entityplayersp) {
             Team team = entity.getTeam();
             Team team1 = entityplayersp.getTeam();
@@ -121,15 +122,16 @@ public class NametagRenderer {
    }
 
    protected static void renderLivingLabel(EntityLivingBase entityIn, String str, double x, double y, double z, int maxDistance, boolean isPlayer) {
-      double d0 = entityIn.getDistanceSqToEntity(a.renderManager.livingPlayer);
+      EntityPlayerSP renderPlayer = Minecraft.getMinecraft().thePlayer;
+      double d0 = entityIn.getDistanceSqToEntity(renderPlayer);
       if (d0 <= (double)(maxDistance * maxDistance)) {
          FontRenderer fontrenderer = a.getFontRendererFromRenderManager();
          float f1 = isPlayer ? 0.02666667F * scale : 0.02666667F;
          GL11.glPushMatrix();
          GL11.glTranslatef((float)x + 0.0F, (float)y + entityIn.height + 0.5F, (float)z);
          GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-         GL11.glRotatef(-a.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-         GL11.glRotatef(a.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
+         GL11.glRotatef(-Minecraft.getMinecraft().getRenderManager().playerViewY, 0.0F, 1.0F, 0.0F);
+         GL11.glRotatef(Minecraft.getMinecraft().getRenderManager().playerViewX, 1.0F, 0.0F, 0.0F);
          GL11.glScalef(-f1, -f1, f1);
          GL11.glDisable(GL11.GL_LIGHTING);
          GL11.glDepthMask(false);
