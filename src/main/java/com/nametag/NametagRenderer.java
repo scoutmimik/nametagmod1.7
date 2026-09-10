@@ -7,7 +7,6 @@ import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.RendererLivingEntity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityArmorStand;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
@@ -30,17 +29,17 @@ public class NametagRenderer {
          if (scale == 0.0F) {
             return;
          }
-
          y += (double)offset;
       }
 
-      if (entity instanceof EntityArmorStand && entity.isChild() || canRenderName(entity)) {
+      if (canRenderName(entity)) {
          double d0 = entity.getDistanceSqToEntity(a.getRenderManager().livingPlayer);
          float f = entity.isSneaking() ? RendererLivingEntity.NAME_TAG_RANGE_SNEAK : RendererLivingEntity.NAME_TAG_RANGE;
          if (d0 < (double)(f * f)) {
-            String s = entity.getDisplayName().getFormattedText();
+            String s = entity.getCommandSenderName();
             float f1 = isPlayer ? 0.02666667F * scale : 0.02666667F;
             GL11.glAlphaFunc(516, 0.1F);
+            
             if (entity.isSneaking()) {
                FontRenderer fontrenderer = a.getFontRendererFromManager();
                GL11.glPushMatrix();
@@ -65,7 +64,6 @@ public class NametagRenderer {
                   tessellator.addVertex((double)(i + 1), (double)8.0F, (double)0.0F);
                   tessellator.addVertex((double)(i + 1), (double)-1.0F, (double)0.0F);
                }
-
                tessellator.draw();
                GL11.glEnable(GL11.GL_TEXTURE_2D);
                GL11.glDepthMask(true);
@@ -90,17 +88,16 @@ public class NametagRenderer {
          Scoreboard scoreboard = ((EntityPlayer)entityIn).getWorldScoreboard();
          ScoreObjective scoreobjective = scoreboard.func_96539_a(2);
          if (scoreobjective != null) {
-            Score score = scoreboard.getValueFromObjective(entityIn.getCommandSenderName(), scoreobjective);
+            Score score = scoreboard.func_96538_b(entityIn.getCommandSenderName(), scoreobjective);
             renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64, true);
             y += (double)((float)a.getFontRendererFromManager().FONT_HEIGHT * 1.15F * p_177069_9_);
          }
       }
-
       renderOffsetLivingLabel(entityIn, x, y, z, str, p_177069_9_, p_177069_10_, true);
    }
 
    protected static boolean canRenderName(EntityLivingBase entity) {
-      return canRenderName2(entity) && (entity.getAlwaysRenderNameTagForRender() || entity.hasCustomNameTag() && entity == a.getRenderManager().livingPlayer);
+      return canRenderName2(entity) && entity.getAlwaysRenderNameTagForRender();
    }
 
    protected static boolean canRenderName2(EntityLivingBase entity) {
@@ -112,22 +109,23 @@ public class NametagRenderer {
             Team team = entity.getTeam();
             Team team1 = entityplayersp.getTeam();
             if (team != null) {
-               Team.EnumVisible team$enumvisible = team.func_178770_i();
-               switch (team$enumvisible) {
-                  case ALWAYS:
-                     return true;
-                  case NEVER:
-                     return false;
-                  case HIDE_FOR_OTHER_TEAMS:
-                     return team1 == null || team.isSameTeam(team1);
-                  case HIDE_FOR_OWN_TEAM:
-                     return team1 == null || !team.isSameTeam(team1);
-                  default:
-                     return true;
+               Team.EnumVisible team$enumvisible = team.getNameTagVisibility();
+               if (team$enumvisible != null) {
+                  switch (team$enumvisible) {
+                     case ALWAYS:
+                        return true;
+                     case NEVER:
+                        return false;
+                     case HIDE_FOR_OTHER_TEAMS:
+                        return team1 == null || team.isSameTeam(team1);
+                     case HIDE_FOR_OWN_TEAM:
+                        return team1 == null || !team.isSameTeam(team1);
+                     default:
+                        return true;
+                  }
                }
             }
          }
-
          return Minecraft.isGuiEnabled() && !entity.isInvisibleToPlayer(entityplayersp) && entity.riddenByEntity == null;
       }
    }
@@ -168,7 +166,6 @@ public class NametagRenderer {
             tessellator.addVertex((double)(j + 1), (double)(8 + i), (double)0.0F);
             tessellator.addVertex((double)(j + 1), (double)(-1 + i), (double)0.0F);
          }
-
          tessellator.draw();
          GL11.glEnable(GL11.GL_TEXTURE_2D);
          fontrenderer.drawString(str, -fontrenderer.getStringWidth(str) / 2, i, 553648127);
@@ -190,7 +187,6 @@ public class NametagRenderer {
       if (s == 0) {
          scale = 0.0F;
       }
-
       scale = (float)s / 100.0F;
    }
 
