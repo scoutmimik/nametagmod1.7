@@ -12,7 +12,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.Team;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
 import org.lwjgl.opengl.GL11;
@@ -99,7 +98,7 @@ public class NametagRenderer {
    }
 
    protected static boolean canRenderName(EntityLivingBase entity) {
-      return canRenderName2(entity) && entity.getAlwaysRenderNameTagForRender();
+      return canRenderName2(entity);
    }
 
    protected static boolean canRenderName2(EntityLivingBase entity) {
@@ -107,13 +106,6 @@ public class NametagRenderer {
       if (entity == entityplayersp) {
          return selftag;
       } else {
-         if (entity instanceof EntityPlayer && entity != entityplayersp) {
-            Team team = entity.getTeam();
-            Team team1 = entityplayersp.getTeam();
-            if (team != null && team1 != null) {
-               return team.isSameTeam(team1);
-            }
-         }
          return Minecraft.isGuiEnabled() && !entity.isInvisibleToPlayer(entityplayersp) && entity.riddenByEntity == null;
       }
    }
