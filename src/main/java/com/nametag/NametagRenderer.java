@@ -35,7 +35,9 @@ public class NametagRenderer {
          double d0 = entity.getDistanceSqToEntity(renderPlayer);
          float f = entity.isSneaking() ? RendererLivingEntity.NAME_TAG_RANGE_SNEAK : RendererLivingEntity.NAME_TAG_RANGE;
          if (d0 < (double)(f * f)) {
-            String s = entity.getCommandSenderName();
+            // ZMENA: Namiesto getCommandSenderName() používame getDisplayName(), 
+            // ktoré obsahuje prefixy a farby.
+            String s = ((EntityPlayer)entity).getDisplayName();
             float f1 = 0.02666667F * scale;
             GL11.glAlphaFunc(516, 0.1F);
             if (entity.isSneaking()) {
@@ -85,6 +87,7 @@ public class NametagRenderer {
          Scoreboard scoreboard = ((EntityPlayer)entityIn).getWorldScoreboard();
          ScoreObjective scoreobjective = scoreboard.getObjectiveInDisplaySlot(2);
          if (scoreobjective != null) {
+            // Tu nechávame getCommandSenderName(), pretože skóre sa v systéme ukladá pod čistým menom
             Score score = scoreboard.getValueFromObjective(entityIn.getCommandSenderName(), scoreobjective);
             renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64, true);
             y += (double)((float)a.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
@@ -108,7 +111,6 @@ public class NametagRenderer {
          return selftag;
       }
 
-      // Odstránená podmienka isSameTeam, ktorá schovávala hráčov v iných tímoch
       return Minecraft.isGuiEnabled() && !entity.isInvisibleToPlayer(entityplayersp) && entity.ridingEntity == null;
    }
 
