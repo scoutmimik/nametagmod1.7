@@ -11,6 +11,7 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
+import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.common.MinecraftForge;
@@ -35,9 +36,11 @@ public class NametagRenderer {
          double d0 = entity.getDistanceSqToEntity(renderPlayer);
          float f = entity.isSneaking() ? RendererLivingEntity.NAME_TAG_RANGE_SNEAK : RendererLivingEntity.NAME_TAG_RANGE;
          if (d0 < (double)(f * f)) {
-            // ZMENA: Namiesto getCommandSenderName() používame getDisplayName(), 
-            // ktoré obsahuje prefixy a farby.
-            String s = ((EntityPlayer)entity).getDisplayName();
+            // Získanie tímu a naformátovanie mena s farebnými kódmi (§) zo scoreboardu
+            EntityPlayer player = (EntityPlayer) entity;
+            ScorePlayerTeam team = (ScorePlayerTeam) player.getTeam();
+            String s = ScorePlayerTeam.formatPlayerName(team, player.getCommandSenderName());
+
             float f1 = 0.02666667F * scale;
             GL11.glAlphaFunc(516, 0.1F);
             if (entity.isSneaking()) {
@@ -87,7 +90,6 @@ public class NametagRenderer {
          Scoreboard scoreboard = ((EntityPlayer)entityIn).getWorldScoreboard();
          ScoreObjective scoreobjective = scoreboard.getObjectiveInDisplaySlot(2);
          if (scoreobjective != null) {
-            // Tu nechávame getCommandSenderName(), pretože skóre sa v systéme ukladá pod čistým menom
             Score score = scoreboard.getValueFromObjective(entityIn.getCommandSenderName(), scoreobjective);
             renderLivingLabel(entityIn, score.getScorePoints() + " " + scoreobjective.getDisplayName(), x, y, z, 64, true);
             y += (double)((float)a.getFontRendererFromRenderManager().FONT_HEIGHT * 1.15F * p_177069_9_);
